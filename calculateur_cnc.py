@@ -30,35 +30,32 @@ with st.container():
 # Divider for visual separation
 st.divider()
 
-# Adjust RPM or Vf and recalculate
-st.subheader("Réajustement des paramètres")
-adjust_option = st.radio(
-    "Quel paramètre souhaitez-vous ajuster ?",
-    ("Ajuster la vitesse de rotation (RPM)", "Ajuster la vitesse d'avance (Vf)")
+# Sliders for adjusting RPM and Vf
+st.subheader("Réglage interactif des paramètres")
+adjusted_RPM = st.slider(
+    "Réglez la vitesse de rotation (RPM)",
+    min_value=100.0,
+    max_value=50000.0,
+    value=float(RPM),
+    step=100.0
+)
+adjusted_Vf = st.slider(
+    "Réglez la vitesse d'avance (Vf) en mm/min",
+    min_value=10.0,
+    max_value=10000.0,
+    value=float(Vf),
+    step=10.0
 )
 
-if adjust_option == "Ajuster la vitesse de rotation (RPM)":
-    new_RPM = st.slider("Nouvelle vitesse de rotation (RPM)", min_value=100.0, max_value=50000.0, value=RPM, step=100.0)
-    new_fz = Vf / (Nd * new_RPM)
-    new_Vc = (new_RPM * math.pi * D) / 1000  # Convert back to m/min
+# Recalculate fz and Vc based on the adjusted parameters
+adjusted_fz = adjusted_Vf / (Nd * adjusted_RPM) if adjusted_RPM > 0 else 0
+adjusted_Vc = (adjusted_RPM * math.pi * D) / 1000  # Convert back to m/min
 
-    with st.container():
-        st.subheader("Résultats réajustés (RPM ajusté)")
-        st.markdown(f"""
-        - **Nouvelle vitesse de rotation (RPM)** : `{new_RPM:.2f}` tr/min  
-        - **Avance par dent recalculée (fz)** : `{new_fz:.3f}` mm/dent  
-        - **Nouvelle vitesse de coupe (Vc)** : `{new_Vc:.2f}` m/min  
-        """)
-
-elif adjust_option == "Ajuster la vitesse d'avance (Vf)":
-    new_Vf = st.slider("Nouvelle vitesse d'avance (Vf) en mm/min", min_value=10.0, max_value=10000.0, value=Vf, step=10.0)
-    new_fz = new_Vf / (Nd * RPM)
-    new_Vc = (RPM * math.pi * D) / 1000  # Convert back to m/min
-
-    with st.container():
-        st.subheader("Résultats réajustés (Vf ajusté)")
-        st.markdown(f"""
-        - **Nouvelle vitesse d'avance (Vf)** : `{new_Vf:.2f}` mm/min  
-        - **Avance par dent recalculée (fz)** : `{new_fz:.3f}` mm/dent  
-        - **Vitesse de coupe (Vc)** : `{new_Vc:.2f}` m/min  
-        """)
+with st.container():
+    st.subheader("Résultats réajustés")
+    st.markdown(f"""
+    - **Nouvelle vitesse de rotation (RPM)** : `{adjusted_RPM:.2f}` tr/min  
+    - **Nouvelle vitesse d'avance (Vf)** : `{adjusted_Vf:.2f}` mm/min  
+    - **Avance par dent recalculée (fz)** : `{adjusted_fz:.3f}` mm/dent  
+    - **Nouvelle vitesse de coupe (Vc)** : `{adjusted_Vc:.2f}` m/min  
+    """)
