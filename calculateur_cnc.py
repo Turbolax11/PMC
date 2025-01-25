@@ -35,7 +35,7 @@ st.subheader("Réglage interactif des paramètres")
 adjusted_RPM = st.slider(
     "Réglez la vitesse de rotation (RPM)",
     min_value=100.0,
-    max_value=50000.0,
+    max_value=30000.0,
     value=float(RPM),
     step=100.0
 )
